@@ -99,7 +99,7 @@ docker compose up --build
 ```
 DMQL_E_COMMERCE_PROJECT/
 ├── schema.sql
-├──data/customers.csv
+├──data/
 |    ├──customers.csv
 |    ├──product.csv
 |    ├──orders.csv
