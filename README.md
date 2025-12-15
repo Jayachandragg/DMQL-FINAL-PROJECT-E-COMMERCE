@@ -99,6 +99,13 @@ docker compose up --build
 ```
 DMQL_E_COMMERCE_PROJECT/
 ├── schema.sql
+├──data/customers.csv
+|    ├──customers.csv
+|    ├──product.csv
+|    ├──orders.csv
+|    ├──order_items.csv
+|    ├──sellers.csv
+|    ├──reviews.csv
 ├── ingest.py
 ├── docker-compose.yml
 ├── phase2_clean/
