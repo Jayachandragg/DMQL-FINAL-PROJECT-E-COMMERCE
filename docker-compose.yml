@@ -1,0 +1,70 @@
+
+
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:14
+    container_name: olist_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: olistdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d olistdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  ingest:
+    build: .
+    container_name: ingest_service
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/olistdb
+    command: ["python", "ingest.py"]
+    volumes:
+      - ./data:/app/data
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ui
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  streamlit:
+    build: ./phase3_app
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: olistdb
+      DB_USER: postgres
+      DB_PASS: postgres
+
+
+volumes:
+  db_data:
